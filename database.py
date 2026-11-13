@@ -96,7 +96,22 @@ def validate_book_details(title, author, category, published_year, price):
 
 
 def add_book(title, author, category, published_year, price):
-    pass
+
+    details = validate_book_details(title, author, category, published_year, price)
+
+    query = """
+        INSERT INTO books
+            (title, author, category, published_year, price)
+        VALUE(%s, %s, %s, %s, %s)
+        RETURNING book_id
+    """
+
+    with get_connection as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, details)
+            book_id = cursor.fetchone()[0]
+
+    return book_id
 
 def view_all_books():
     pass

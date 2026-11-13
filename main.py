@@ -39,6 +39,18 @@ def read_book_details():
     return title, author, category, published_year, price
 
 
+def display_book(book):
+
+    print("-" * 35)
+    print(f"ID: {book['book_id']}")
+    print(f"Title: {book['title']}")
+    print(f"Author: {book['author']}")
+    print(f"Category: {book['category']}")
+    print(f"Year: {book['published_year']}")
+    print(f"Price: ${book['price']:.2f}")
+    print("-" * 35)
+
+
 def main():
     try:
         with get_connection() as connection:

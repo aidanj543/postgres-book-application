@@ -102,11 +102,11 @@ def add_book(title, author, category, published_year, price):
     query = """
         INSERT INTO books
             (title, author, category, published_year, price)
-        VALUE(%s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s)
         RETURNING book_id
     """
 
-    with get_connection as connection:
+    with get_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(query, details)
             book_id = cursor.fetchone()[0]
@@ -121,23 +121,23 @@ def view_all_books():
         ORDER BY book_id;
     """
 
-    with get_connection as connection:
+    with get_connection() as connection:
         with connection.cursor(row_factory=dict_row) as cursor:
             cursor.execute(query)
             books = cursor.fetchall()
     return books
 
 
-def get_book_by_id(book_id):
+def search_book_by_id(book_id):
 
-    validate_book_details(book_id)
+    validate_book_id(book_id)
 
     query = """
         SELECT * FROM books
         WHERE book_id = %s;
     """
 
-    with get_connection as connection:
+    with get_connection() as connection:
         with connection.cursor(row_factory = dict_row) as cursor:
             cursor.execute(query, (book_id,))
             book = cursor.fetchone()
@@ -145,9 +145,50 @@ def get_book_by_id(book_id):
     return book
 
 
+
 def update_book(book_id, title, author, category, published_year, price):
-    pass
+
+    validate_book_id(book_id)
+
+    details = validate_book_details(
+        title, author, category, published_year, price
+    )
+
+    query = """
+        UPDATE books
+        SET title = %s,
+            author = %s,
+            category = %s,
+            published_year = %s,
+            price = %s
+        WHERE book_id = %s
+        RETURNING book_id;
+    """
+
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, (*details, book_id))
+            updated = cursor.fetchone()
+
+    return updated is not None
+
+
 
 def delete_book(book_id):
-    pass
+
+    validate_book_id(book_id)
+
+    query = """
+        DELETE FROM books
+        WHERE book_id = %s
+        RETURNING book_id;
+    """
+
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, (book_id,))
+            deleted = cursor.fetchone()
+
+    return deleted is not None
+
 

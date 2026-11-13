@@ -90,7 +90,7 @@ def help_search_book():
 
 
 
-def handle_update_book():
+def help_update_book():
 
     print("\n--- Update a Book ---")
 
@@ -118,7 +118,7 @@ def handle_update_book():
 
 
 
-def handle_delete_book():
+def help_delete_book():
 
     print("\n--- Delete a Book ---")
 
@@ -166,21 +166,40 @@ def display_menu():
 
 
 def main():
-    try:
-        with get_connection() as connection:
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT version();")
-                result = cursor.fetchone()
+    options = {
+        "1": help_add_book,
+        "2": help_view_all_books,
+        "3": help_search_book,
+        "4": help_update_book,
+        "5": help_delete_book
+    }
 
-                print("Connected to PostgreSQL!!")
-                print("Server Version: ", result[0])
+    while True:
+        display_menu()
 
-    except (ConnectionError, ValueError) as e:
-        print("Database connection failed: ", e)
+        try:
+            choice = input("\nChoose an option: ").strip()
 
-    except Exception as e:
-        print("Random error: ", type(e).__name__)
+            if choice == "6":
+                print("\nThank you for using PostgreSQL Book Management System")
+                break
 
+            option = options.get(choice)
+
+            if option is None:
+                print("Invalid option. Please choose from list above.")
+                continue
+
+            option()
+
+            
+        except ValueError as e:
+            print(f"\nInvalid input: {e}")
+
+        except psycopg.Error:
+            print(f"\nDatabase error. Try again")
+        except ConnectionError:
+            print(f"\nUnable to connect to database")
 
 if __name__ == "__main__":
     main()

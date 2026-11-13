@@ -17,6 +17,26 @@ def read_positive_id():
 
     return book_id
 
+def read_book_details():
+    title = input("Title: ").strip()
+    author = input("Author: ").strip()
+    category = input("Category: ").strip()
+
+    year_text = input("Published Year: ").strip()
+
+    try:
+        published_year = int(year_text)
+    except ValueError:
+        raise ValueError("Published year must be an Integer")
+
+    price_text = input("Price: ").strip()
+
+    try:
+        price = Decimal(price_text)
+    except InvalidOperation:
+        raise ValueError("Price must be a valid amount")
+
+    return title, author, category, published_year, price
 
 
 def main():

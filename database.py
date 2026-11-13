@@ -47,3 +47,49 @@ def validate_book_id(book_id):
 
     return book_id
 
+
+def validate_book_details(title, author, category, published_year, price):
+    """Validate book details before inserting or updating."""
+
+    text_fields = {
+        "title": (title, 150),
+        "author": (author, 100),
+        "category": (category, 50),
+    }
+
+    cleaned = {}
+
+    for name, (value, max_length) in text_fields.items():
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{name} cannot be empty.")
+
+        value = value.strip()
+
+        if len(value) > max_length:
+            raise ValueError(
+                f"{name} cannot exceed {max_length} characters."
+            )
+
+        cleaned[name] = value
+
+    if type(published_year) is not int or not (0 <= published_year <= 9999):
+        raise ValueError("Published year must be an integer from 0 to 9999.")
+
+    try:
+        amount = Decimal(str(price))
+    except (InvalidOperation, ValueError):
+        raise ValueError("Price must be a valid number.")
+
+    if not amount.is_finite() or amount < 0 or amount > Decimal("99999999.99"):
+        raise ValueError("Price must be between 0 and 99999999.99.")
+
+    if amount != amount.quantize(Decimal("0.01")):
+        raise ValueError("Price cannot have more than two decimal places.")
+
+    return (
+        cleaned["title"],
+        cleaned["author"],
+        cleaned["category"],
+        published_year,
+        amount,
+    )

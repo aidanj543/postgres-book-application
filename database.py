@@ -114,7 +114,18 @@ def add_book(title, author, category, published_year, price):
     return book_id
 
 def view_all_books():
-    pass
+
+    query = """
+        SELECT book_id, title, author, category, published_year, price
+        FROM books
+        ORDER BY book_id;
+    """
+
+    with get_connection as connection:
+        with connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute(query)
+            books = cursor.fetchall()
+    return books
 
 
 def get_book_by_id(book_id):

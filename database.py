@@ -129,7 +129,21 @@ def view_all_books():
 
 
 def get_book_by_id(book_id):
-    pass
+
+    validate_book_details(book_id)
+
+    query = """
+        SELECT * FROM books
+        WHERE book_id = %s;
+    """
+
+    with get_connection as connection:
+        with connection.cursor(row_factory = dict_row) as cursor:
+            cursor.execute(query, (book_id,))
+            book = cursor.fetchone()
+
+    return book
+
 
 def update_book(book_id, title, author, category, published_year, price):
     pass

@@ -1,6 +1,8 @@
 import os
 import psycopg
 from dotenv import load_dotenv
+from decimal import Decimal, InvalidOperation
+from psycopg.rows import dict_row
 
 load_dotenv()
 
@@ -36,3 +38,157 @@ def get_connection():
         raise ConnectionError(
             "Unable to connect to database"
         ) from e
+
+
+
+def validate_book_id(book_id):
+    if type(book_id) is not int or book_id <=0:
+        raise ValueError("Book ID must be positive")
+
+    return book_id
+
+
+def validate_book_details(title, author, category, published_year, price):
+    """Validate book details before inserting or updating."""
+
+    text_fields = {
+        "title": (title, 150),
+        "author": (author, 100),
+        "category": (category, 50),
+    }
+
+    cleaned = {}
+
+    for name, (value, max_length) in text_fields.items():
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{name} cannot be empty.")
+
+        value = value.strip()
+
+        if len(value) > max_length:
+            raise ValueError(
+                f"{name} cannot exceed {max_length} characters."
+            )
+
+        cleaned[name] = value
+
+    if type(published_year) is not int or not (0 <= published_year <= 9999):
+        raise ValueError("Published year must be an integer from 0 to 9999.")
+
+    try:
+        amount = Decimal(str(price))
+    except (InvalidOperation, ValueError):
+        raise ValueError("Price must be a valid number.")
+
+    if not amount.is_finite() or amount < 0 or amount > Decimal("99999999.99"):
+        raise ValueError("Price must be between 0 and 99999999.99.")
+
+    if amount != amount.quantize(Decimal("0.01")):
+        raise ValueError("Price cannot have more than two decimal places.")
+
+    return (
+        cleaned["title"],
+        cleaned["author"],
+        cleaned["category"],
+        published_year,
+        amount,
+    )
+
+
+def add_book(title, author, category, published_year, price):
+
+    details = validate_book_details(title, author, category, published_year, price)
+
+    query = """
+        INSERT INTO books
+            (title, author, category, published_year, price)
+        VALUES (%s, %s, %s, %s, %s)
+        RETURNING book_id
+    """
+
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, details)
+            book_id = cursor.fetchone()[0]
+
+    return book_id
+
+def view_all_books():
+
+    query = """
+        SELECT book_id, title, author, category, published_year, price
+        FROM books
+        ORDER BY book_id;
+    """
+
+    with get_connection() as connection:
+        with connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute(query)
+            books = cursor.fetchall()
+    return books
+
+
+def search_book_by_id(book_id):
+
+    validate_book_id(book_id)
+
+    query = """
+        SELECT * FROM books
+        WHERE book_id = %s;
+    """
+
+    with get_connection() as connection:
+        with connection.cursor(row_factory = dict_row) as cursor:
+            cursor.execute(query, (book_id,))
+            book = cursor.fetchone()
+
+    return book
+
+
+
+def update_book(book_id, title, author, category, published_year, price):
+
+    validate_book_id(book_id)
+
+    details = validate_book_details(
+        title, author, category, published_year, price
+    )
+
+    query = """
+        UPDATE books
+        SET title = %s,
+            author = %s,
+            category = %s,
+            published_year = %s,
+            price = %s
+        WHERE book_id = %s
+        RETURNING book_id;
+    """
+
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, (*details, book_id))
+            updated = cursor.fetchone()
+
+    return updated is not None
+
+
+
+def delete_book(book_id):
+
+    validate_book_id(book_id)
+
+    query = """
+        DELETE FROM books
+        WHERE book_id = %s
+        RETURNING book_id;
+    """
+
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, (book_id,))
+            deleted = cursor.fetchone()
+
+    return deleted is not None
+
+

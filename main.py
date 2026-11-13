@@ -61,6 +61,19 @@ def help_add_book():
 
 
 
+def help_view_all_books():
+    print("\n--- All Current Books ---")
+
+    books = view_all_books()
+
+    if not books:
+        print("No books found in database")
+
+    print(f"Total books: {len(books)}")
+
+    for book in books:
+        display_book(book)
+
 def main():
     try:
         with get_connection() as connection:

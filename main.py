@@ -51,6 +51,16 @@ def display_book(book):
     print("-" * 35)
 
 
+
+def help_add_book():
+    print("\n--- Add new book ---")
+    details = read_book_details()
+    book_id = add_book(*details)
+
+    print(f"\nBook added! Book ID: {book_id}")
+
+
+
 def main():
     try:
         with get_connection() as connection:

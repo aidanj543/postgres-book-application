@@ -1,6 +1,8 @@
 import os
 import psycopg
 from dotenv import load_dotenv
+from decimal import Decimal, InvalidOperation
+from psycopg.rows import dict_row
 
 load_dotenv()
 
@@ -36,3 +38,12 @@ def get_connection():
         raise ConnectionError(
             "Unable to connect to database"
         ) from e
+
+
+
+def validate_book_id(book_id):
+    if type(book_id) is not int or book_id <=0:
+        raise ValueError("Book ID must be positive")
+
+    return book_id
+

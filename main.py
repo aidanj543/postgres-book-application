@@ -89,6 +89,68 @@ def help_search_book():
         display_book(book)
 
 
+
+def handle_update_book():
+
+    print("\n--- Update a Book ---")
+
+    book_id = read_positive_id()
+
+    existing_book = search_book_by_id(book_id)
+
+    if existing_book is None:
+        print(f"Book was not found with ID: {book_id}")
+        return
+
+    print("\nCurrent book details:")
+    display_book(existing_book)
+
+    print("\nEnter the updated details:")
+    details = read_book_details()
+
+    updated = update_book(book_id, *details)
+
+    if updated:
+        print("\nBook updated successfully!")
+    else:
+        print("Book was not found. Database remains unchanged")
+
+
+
+
+def handle_delete_book():
+
+    print("\n--- Delete a Book ---")
+
+    book_id = read_positive_id()
+
+    book = search_book_by_id(book_id)
+
+    if book is None:
+        print(f"Book was not found with ID: {book_id}")
+        return
+
+    print("\nBook to delete:")
+    display_book(book)
+
+    confirmation = input(
+        "Are you sure you want to delete this book? (y/n): "
+    ).strip().lower()
+
+    if confirmation != "y":
+        print("Delete was cancelled.")
+        return
+
+    deleted = delete_book(book_id)
+
+    if deleted:
+        print("Book deleted successfully!")
+    else:
+        print("Book was not found. Nothing was deleted.")
+
+
+
+
 def main():
     try:
         with get_connection() as connection:

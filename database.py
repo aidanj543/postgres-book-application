@@ -93,3 +93,21 @@ def validate_book_details(title, author, category, published_year, price):
         published_year,
         amount,
     )
+
+
+def add_book(title, author, category, published_year, price):
+    pass
+
+def view_all_books():
+    pass
+
+
+def get_book_by_id(book_id):
+    pass
+
+def update_book(book_id, title, author, category, published_year, price):
+    pass
+
+def delete_book(book_id):
+    pass
+

@@ -149,6 +149,20 @@ def handle_delete_book():
         print("Book was not found. Nothing was deleted.")
 
 
+def display_menu():
+
+    print("\n----------------------")
+    print("LIBARY MANAGEMENT SYSTEM")
+    print("\n----------------------")
+    print("1. Add new book")
+    print("2. View all books")
+    print("3. Search book with ID")
+    print("4. Update book")
+    print("5. Delete book")
+    print("6. Exit")
+
+
+
 
 
 def main():

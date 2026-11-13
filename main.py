@@ -27,7 +27,7 @@ def read_book_details():
     try:
         published_year = int(year_text)
     except ValueError:
-        raise ValueError("Published year must be an Integer")
+        raise ValueError("Published year must be an integer")
 
     price_text = input("Price: ").strip()
 
@@ -54,11 +54,11 @@ def display_book(book):
 
 def help_add_book():
     print("\n--- Add new book ---")
+
     details = read_book_details()
     book_id = add_book(*details)
 
-    print(f"\nBook added! Book ID: {book_id}")
-
+    print(f"\nBook added successfully! Book ID: {book_id}")
 
 
 def help_view_all_books():
@@ -138,7 +138,7 @@ def help_delete_book():
     ).strip().lower()
 
     if confirmation != "y":
-        print("Delete was cancelled.")
+        print("Deletion cancelled.")
         return
 
     deleted = delete_book(book_id)
@@ -150,15 +150,14 @@ def help_delete_book():
 
 
 def display_menu():
-
-    print("\n----------------------")
-    print("LIBARY MANAGEMENT SYSTEM")
-    print("\n----------------------")
-    print("1. Add new book")
-    print("2. View all books")
-    print("3. Search book with ID")
-    print("4. Update book")
-    print("5. Delete book")
+    print("\n================================")
+    print("   LIBRARY MANAGEMENT SYSTEM")
+    print("================================")
+    print("1. Add New Book")
+    print("2. View All Books")
+    print("3. Search Book By ID")
+    print("4. Update Book")
+    print("5. Delete Book")
     print("6. Exit")
 
 
@@ -192,7 +191,7 @@ def main():
 
             option()
 
-            
+
         except ValueError as e:
             print(f"\nInvalid input: {e}")
 

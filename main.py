@@ -74,6 +74,21 @@ def help_view_all_books():
     for book in books:
         display_book(book)
 
+
+
+def help_search_book():
+    print("\n--- Searching for Book ---")
+
+    book_id = read_positive_id()
+
+    book = search_book_by_id(book_id)
+
+    if book is None:
+        print(f"Book was not found with ID: {book_id}")
+    else:
+        display_book(book)
+
+
 def main():
     try:
         with get_connection() as connection:
